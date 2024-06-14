@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
 import {Button, Col, Container, Row, Stack} from 'react-bootstrap'
+import {useEffect} from 'react'
 
 import {useStore} from './hook/useStore'
 import {AUTO_LANGUAGE} from './constants'
@@ -8,6 +9,7 @@ import {ArrowsIcon} from './components/Icons'
 import {LanguageSelector} from './components/LanguageSelector'
 import {SectionType} from './types.d'
 import {TextArea} from './components/TextArea'
+import {deeplTranslate} from './services/translate'
 
 function App() {
   const {
@@ -22,6 +24,19 @@ function App() {
     fromText,
     resultText,
   } = useStore()
+
+  useEffect(() => {
+    if (fromText === '') return
+
+    deeplTranslate({fromLanguage, toLanguage, text: fromText})
+      .then((result) => {
+        if (result == null) return
+        setResultText(result)
+      })
+      .catch(() => {
+        setResultText('Error')
+      })
+  }, [fromText, fromLanguage, toLanguage])
 
   return (
     <Container fluid>

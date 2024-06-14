@@ -1,20 +1,18 @@
 import {useReducer} from 'react'
 
-import {Action, FromLanguage, Language, type State} from '../types'
+import {Action, FromLanguage, Language, State} from '../types'
 import {AUTO_LANGUAGE} from '../constants'
 
 const initialState: State = {
-  fromLanguage: 'auto',
-  toLanguage: 'en',
+  fromLanguage: AUTO_LANGUAGE,
+  toLanguage: 'EN',
   fromText: '',
   resultText: '',
   loading: false,
 }
 
 function reducer(state: State, action: Action): State {
-  const {type} = action
-
-  switch (type) {
+  switch (action.type) {
     case 'INTERCHANGE_LANGUAGES':
       if (state.fromLanguage !== AUTO_LANGUAGE) {
         return {
@@ -22,32 +20,37 @@ function reducer(state: State, action: Action): State {
           fromLanguage: state.toLanguage,
           toLanguage: state.fromLanguage,
         }
-      } else return state
+      }
 
-      break
+      return state
 
     case 'SET_FROM_LANGUAGE':
+      if (state.fromLanguage === action.payload) return state
+
       return {
         ...state,
         fromLanguage: action.payload,
+        resultText: '',
+        loading: state.fromText !== '',
       }
-      break
 
     case 'SET_TO_LANGUAGE':
+      if (state.toLanguage === action.payload) return state
+
       return {
         ...state,
         toLanguage: action.payload,
+        resultText: '',
+        loading: state.fromText !== '',
       }
-      break
 
     case 'SET_FROM_TEXT':
       return {
         ...state,
-        loading: true,
+        loading: state.fromText !== '',
         fromText: action.payload,
         resultText: '',
       }
-      break
 
     case 'SET_RESULT_TEXT':
       return {
@@ -55,11 +58,9 @@ function reducer(state: State, action: Action): State {
         loading: false,
         resultText: action.payload,
       }
-      break
 
     default:
       return state
-      break
   }
 }
 
